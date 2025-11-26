@@ -1,0 +1,747 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <title>JavaScript Training Website</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+
+    <!-- Bootstrap CSS -->
+    <link
+      href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css"
+      rel="stylesheet"
+    />
+
+    <style>
+      body {
+        background-color: #f5f7fb;
+      }
+
+      .navbar-brand span {
+        font-weight: 700;
+        letter-spacing: 0.05em;
+      }
+
+      .hero {
+        padding: 4rem 1rem;
+      }
+
+      .hero-title {
+        font-size: 2.4rem;
+        font-weight: 700;
+      }
+
+      .hero-subtitle {
+        font-size: 1.1rem;
+        color: #6c757d;
+      }
+
+      .section-title {
+        font-weight: 700;
+        margin-bottom: 1.5rem;
+      }
+
+      pre {
+        background: #1e293b;
+        color: #e5e7eb;
+        padding: 1rem;
+        border-radius: 0.5rem;
+        overflow-x: auto;
+        font-size: 0.9rem;
+      }
+
+      .quiz-question {
+        border-radius: 0.75rem;
+        padding: 1.25rem;
+        background: #ffffff;
+        border: 1px solid #e5e7eb;
+        margin-bottom: 1rem;
+      }
+
+      .badge-topic {
+        font-size: 0.7rem;
+        letter-spacing: 0.08em;
+        text-transform: uppercase;
+      }
+
+      footer {
+        padding: 1rem 0;
+        font-size: 0.85rem;
+        color: #6c757d;
+      }
+    </style>
+  </head>
+
+  <body>
+    <div id="root"></div>
+
+    <!-- React + ReactDOM + Babel from CDN -->
+    <script
+      src="https://unpkg.com/react@18/umd/react.development.js"
+      crossorigin
+    ></script>
+    <script
+      src="https://unpkg.com/react-dom@18/umd/react-dom.development.js"
+      crossorigin
+    ></script>
+    <script src="https://unpkg.com/babel-standalone@6/babel.min.js"></script>
+
+    <!-- Bootstrap JS (optional for nav collapse) -->
+    <script
+      src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"
+    ></script>
+
+    <!-- React App -->
+    <script type="text/babel">
+      const { useState } = React;
+
+      // ----------------- Quiz Data -----------------
+      const quizTopics = [
+        {
+          id: "input",
+          name: "Input Data",
+          questions: [
+            {
+              id: "input-1",
+              text: "Which JavaScript function is commonly used to read input from the user?",
+              options: ["console.log()", "prompt()", "alert()", "input()"],
+              correctIndex: 1,
+            },
+            {
+              id: "input-2",
+              text: "What data type is returned by the prompt() function by default?",
+              options: ["number", "string", "boolean", "object"],
+              correctIndex: 1,
+            },
+            {
+              id: "input-3",
+              text: "How can you convert user input from prompt() to a number?",
+              options: [
+                "Number(value)",
+                "value.toNum()",
+                "parseIntString(value)",
+                "convert(value)",
+              ],
+              correctIndex: 0,
+            },
+          ],
+        },
+        {
+          id: "operators",
+          name: "Numeric Operators",
+          questions: [
+            {
+              id: "op-1",
+              text: "Which operator is used for multiplication in JavaScript?",
+              options: ["x", "mul", "*", "**"],
+              correctIndex: 2,
+            },
+            {
+              id: "op-2",
+              text: "What is the result of 10 % 3 ?",
+              options: ["0", "1", "2", "3"],
+              correctIndex: 1,
+            },
+            {
+              id: "op-3",
+              text: "Which operator is used for exponent (power) in modern JavaScript?",
+              options: ["^", "pow", "**", "exp()"],
+              correctIndex: 2,
+            },
+          ],
+        },
+        {
+          id: "conditions",
+          name: "Conditions",
+          questions: [
+            {
+              id: "cond-1",
+              text: "Which keyword is used to start a simple condition in JavaScript?",
+              options: ["when", "if", "switch", "case"],
+              correctIndex: 1,
+            },
+            {
+              id: "cond-2",
+              text: "Which operator is used for strict equality (value and type)?",
+              options: ["==", "=", "===", "!:="],
+              correctIndex: 2,
+            },
+            {
+              id: "cond-3",
+              text: "What is the opposite of the > operator?",
+              options: ["<", ">=", "<=", "!=="],
+              correctIndex: 0,
+            },
+          ],
+        },
+        {
+          id: "loops",
+          name: "Loops",
+          questions: [
+            {
+              id: "loop-1",
+              text: "Which loop is best when you know the exact number of repetitions?",
+              options: ["while", "for", "do...while", "switch"],
+              correctIndex: 1,
+            },
+            {
+              id: "loop-2",
+              text: "Which keyword stops the loop immediately?",
+              options: ["exit", "stop", "break", "continue"],
+              correctIndex: 2,
+            },
+            {
+              id: "loop-3",
+              text: "What does i++ mean in a loop?",
+              options: [
+                "increase i by 2",
+                "decrease i by 1",
+                "increase i by 1",
+                "reset i to 0",
+              ],
+              correctIndex: 2,
+            },
+          ],
+        },
+        {
+          id: "output",
+          name: "Display Output",
+          questions: [
+            {
+              id: "out-1",
+              text: "Which function is commonly used to print messages in the browser console?",
+              options: ["alert()", "console.write()", "console.log()", "print()"],
+              correctIndex: 2,
+            },
+            {
+              id: "out-2",
+              text: "Which method can be used to change the text inside an HTML element?",
+              options: [
+                "document.writeText()",
+                "element.innerHTML = ...",
+                "console.logText()",
+                "alertText()",
+              ],
+              correctIndex: 1,
+            },
+            {
+              id: "out-3",
+              text: "Which of the following shows a popup message to the user?",
+              options: ["prompt()", "alert()", "console.log()", "innerHTML()"],
+              correctIndex: 1,
+            },
+          ],
+        },
+      ];
+
+      // ----------------- Pages -----------------
+      function MainPage({ onNavigate }) {
+        return (
+          <div className="container hero">
+            <div className="row align-items-center">
+              <div className="col-md-7 mb-4">
+                <h1 className="hero-title mb-3">
+                  JavaScript Training Website
+                </h1>
+                <p className="hero-subtitle mb-4">
+                  A simple computer-based training website to help trainees
+                  understand the basic concepts of the JavaScript programming
+                  language.
+                </p>
+
+                <div className="mb-4">
+                  <h5 className="section-title">Vision &amp; Mission</h5>
+                  <p className="mb-1">
+                    <strong>Vision:</strong> To make learning programming easy
+                    and friendly for beginners.
+                  </p>
+                  <p>
+                    <strong>Mission:</strong> Provide clear lessons, practical
+                    examples, and quizzes to test and improve your skills.
+                  </p>
+                </div>
+
+                <div className="mb-4">
+                  <h5 className="section-title">About the Developer</h5>
+                  <p>
+                    This website is developed by <strong>Omar Hany Shalaby</strong>,
+                    a cybersecurity student interested in web development and
+                    training tools.
+                  </p>
+                </div>
+
+                <div className="mb-4">
+                  <h5 className="section-title">Contact Us</h5>
+                  <p className="mb-1">Email: omar@example.com</p>
+                  <p>Telegram: @omarhany (example)</p>
+                </div>
+
+                <div className="d-flex flex-wrap gap-2">
+                  <button
+                    className="btn btn-primary"
+                    onClick={() => onNavigate("lessons")}
+                  >
+                    Go to Lessons
+                  </button>
+                  <button
+                    className="btn btn-outline-primary"
+                    onClick={() => onNavigate("examples")}
+                  >
+                    View Examples
+                  </button>
+                  <button
+                    className="btn btn-success"
+                    onClick={() => onNavigate("quiz")}
+                  >
+                    Start Quiz
+                  </button>
+                </div>
+              </div>
+
+              <div className="col-md-5">
+                <div className="card shadow-sm border-0">
+                  <div className="card-body text-center">
+                    <div
+                      className="rounded-circle d-inline-flex align-items-center justify-content-center mb-3"
+                      style={{
+                        width: "96px",
+                        height: "96px",
+                        background:
+                          "linear-gradient(135deg, #0d6efd, #6610f2)",
+                        color: "#fff",
+                        fontSize: "2.5rem",
+                        fontWeight: "700",
+                      }}
+                    >
+                      JS
+                    </div>
+                    <h5 className="card-title mb-2">Website Logo</h5>
+                    <p className="card-text text-muted">
+                      Simple logo representing JavaScript training platform.
+                    </p>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        );
+      }
+
+      function LessonsPage() {
+        return (
+          <div className="container py-4">
+            <h2 className="section-title mb-3">Lessons</h2>
+            <p className="mb-4">
+              In this section we introduce the basic concepts of JavaScript:
+              input, numeric operators, conditions, loops, and how to display
+              the output.
+            </p>
+
+            <div className="row g-4">
+              <div className="col-md-6">
+                <div className="card h-100 shadow-sm">
+                  <div className="card-body">
+                    <h5 className="card-title">1. How to Input Data</h5>
+                    <p>
+                      We can use the <code>prompt()</code> function to read
+                      input from the user.
+                    </p>
+                    <pre>
+{`const name = prompt("Enter your name:");
+console.log("Hello " + name);`}
+                    </pre>
+                  </div>
+                </div>
+              </div>
+
+              <div className="col-md-6">
+                <div className="card h-100 shadow-sm">
+                  <div className="card-body">
+                    <h5 className="card-title">
+                      2. Basic Numeric Operators
+                    </h5>
+                    <p>We can add, subtract, multiply and divide numbers.</p>
+                    <pre>
+{`const a = 10;
+const b = 3;
+
+const sum = a + b;
+const diff = a - b;
+const product = a * b;
+const quotient = a / b;
+const remainder = a % b;`}
+                    </pre>
+                  </div>
+                </div>
+              </div>
+
+              <div className="col-md-6">
+                <div className="card h-100 shadow-sm">
+                  <div className="card-body">
+                    <h5 className="card-title">3. Conditions</h5>
+                    <p>
+                      Conditions allow the program to make decisions using{" "}
+                      <code>if</code>, <code>else if</code> and{" "}
+                      <code>else</code>.
+                    </p>
+                    <pre>
+{`const grade = 85;
+
+if (grade >= 90) {
+  console.log("Excellent");
+} else if (grade >= 60) {
+  console.log("Passed");
+} else {
+  console.log("Failed");
+}`}
+                    </pre>
+                  </div>
+                </div>
+              </div>
+
+              <div className="col-md-6">
+                <div className="card h-100 shadow-sm">
+                  <div className="card-body">
+                    <h5 className="card-title">4. Loops</h5>
+                    <p>
+                      Loops repeat a block of code multiple times. Here is a{" "}
+                      <code>for</code> loop:
+                    </p>
+                    <pre>
+{`for (let i = 1; i <= 5; i++) {
+  console.log("Number:", i);
+}`}
+                    </pre>
+                  </div>
+                </div>
+              </div>
+
+              <div className="col-12">
+                <div className="card h-100 shadow-sm">
+                  <div className="card-body">
+                    <h5 className="card-title">5. How to Display the Output</h5>
+                    <p>
+                      We can display output in different ways: using{" "}
+                      <code>console.log()</code>, <code>alert()</code>, or by
+                      changing the HTML content.
+                    </p>
+                    <pre>
+{`console.log("Message in the console");
+alert("Message in a popup");
+
+// Display output inside an HTML element
+const outputDiv = document.getElementById("output");
+outputDiv.innerHTML = "Result = " + 42;`}
+                    </pre>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        );
+      }
+
+      function ExamplesPage() {
+        return (
+          <div className="container py-4">
+            <h2 className="section-title mb-3">Examples</h2>
+            <p className="mb-4">
+              Here are simple solved examples for each concept.
+            </p>
+
+            <div className="row g-4">
+              <div className="col-md-6">
+                <div className="card h-100 shadow-sm">
+                  <div className="card-body">
+                    <h5 className="card-title">
+                      Example 1: Sum of Two Numbers (Input + Operators)
+                    </h5>
+                    <pre>
+{`const x = Number(prompt("Enter first number:"));
+const y = Number(prompt("Enter second number:"));
+const sum = x + y;
+alert("The sum is: " + sum);`}
+                    </pre>
+                  </div>
+                </div>
+              </div>
+
+              <div className="col-md-6">
+                <div className="card h-100 shadow-sm">
+                  <div className="card-body">
+                    <h5 className="card-title">
+                      Example 2: Check if Number is Even or Odd (Conditions)
+                    </h5>
+                    <pre>
+{`const n = Number(prompt("Enter a number:"));
+
+if (n % 2 === 0) {
+  alert("The number is even");
+} else {
+  alert("The number is odd");
+}`}
+                    </pre>
+                  </div>
+                </div>
+              </div>
+
+              <div className="col-md-6">
+                <div className="card h-100 shadow-sm">
+                  <div className="card-body">
+                    <h5 className="card-title">
+                      Example 3: Print Numbers from 1 to 5 (Loops)
+                    </h5>
+                    <pre>
+{`for (let i = 1; i <= 5; i++) {
+  console.log(i);
+}`}
+                    </pre>
+                  </div>
+                </div>
+              </div>
+
+              <div className="col-md-6">
+                <div className="card h-100 shadow-sm">
+                  <div className="card-body">
+                    <h5 className="card-title">
+                      Example 4: Display Result in a Web Page (Output)
+                    </h5>
+                    <pre>
+{`const a = 7;
+const b = 4;
+const result = a * b;
+
+const resultDiv = document.getElementById("result");
+resultDiv.innerHTML = "7 × 4 = " + result;`}
+                    </pre>
+                    <p className="mt-2 text-muted">
+                      In a real page you need an element with id{" "}
+                      <code>result</code>.
+                    </p>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        );
+      }
+
+      function QuizPage() {
+        const [answers, setAnswers] = useState({});
+        const [submitted, setSubmitted] = useState(false);
+
+        const allQuestions = quizTopics.flatMap((topic) =>
+          topic.questions.map((q) => ({ ...q, topicId: topic.id }))
+        );
+
+        const handleChange = (questionId, optionIndex) => {
+          setAnswers((prev) => ({
+            ...prev,
+            [questionId]: optionIndex,
+          }));
+        };
+
+        const handleSubmit = (e) => {
+          e.preventDefault();
+          setSubmitted(true);
+        };
+
+        let score = 0;
+        allQuestions.forEach((q) => {
+          if (answers[q.id] === q.correctIndex) score++;
+        });
+
+        return (
+          <div className="container py-4">
+            <h2 className="section-title mb-3">Quiz</h2>
+            <p className="mb-4">
+              The quiz contains at least three questions for each concept:
+              input, numeric operators, conditions, loops and output. Select the
+              best answer for each question, then click{" "}
+              <strong>Submit Quiz</strong> to see your score.
+            </p>
+
+            <form onSubmit={handleSubmit}>
+              {quizTopics.map((topic) => (
+                <div key={topic.id} className="mb-4">
+                  <div className="d-flex align-items-center mb-2">
+                    <span className="badge bg-primary badge-topic me-2">
+                      {topic.name.toUpperCase()}
+                    </span>
+                  </div>
+                  {topic.questions.map((q, index) => (
+                    <div key={q.id} className="quiz-question">
+                      <p className="mb-2">
+                        <strong>
+                          Q{index + 1}: {q.text}
+                        </strong>
+                      </p>
+                      {q.options.map((opt, i) => {
+                        const selected = answers[q.id] === i;
+                        const isCorrect = submitted && i === q.correctIndex;
+                        const isWrong =
+                          submitted &&
+                          selected &&
+                          i !== q.correctIndex;
+
+                        let optionClass = "form-check-label";
+                        if (isCorrect) optionClass += " text-success fw-semibold";
+                        if (isWrong) optionClass += " text-danger fw-semibold";
+
+                        return (
+                          <div className="form-check mb-1" key={i}>
+                            <input
+                              type="radio"
+                              className="form-check-input"
+                              name={q.id}
+                              id={q.id + "-" + i}
+                              checked={selected || false}
+                              onChange={() => handleChange(q.id, i)}
+                            />
+                            <label
+                              className={optionClass}
+                              htmlFor={q.id + "-" + i}
+                            >
+                              {opt}
+                            </label>
+                          </div>
+                        );
+                      })}
+                    </div>
+                  ))}
+                </div>
+              ))}
+
+              <button type="submit" className="btn btn-success">
+                Submit Quiz
+              </button>
+            </form>
+
+            {submitted && (
+              <div className="alert alert-info mt-4">
+                <h5 className="mb-1">Your Score</h5>
+                <p className="mb-0">
+                  You answered{" "}
+                  <strong>
+                    {score} / {allQuestions.length}
+                  </strong>{" "}
+                  questions correctly.
+                </p>
+              </div>
+            )}
+          </div>
+        );
+      }
+
+      // ----------------- Main App -----------------
+      function App() {
+        const [page, setPage] = useState("main");
+
+        let content;
+        if (page === "lessons") content = <LessonsPage />;
+        else if (page === "examples") content = <ExamplesPage />;
+        else if (page === "quiz") content = <QuizPage />;
+        else content = <MainPage onNavigate={setPage} />;
+
+        return (
+          <>
+            <nav className="navbar navbar-expand-lg navbar-dark bg-dark">
+              <div className="container">
+                <a
+                  className="navbar-brand"
+                  href="#"
+                  onClick={(e) => {
+                    e.preventDefault();
+                    setPage("main");
+                  }}
+                >
+                  <span>JS Training</span>
+                </a>
+                <button
+                  className="navbar-toggler"
+                  type="button"
+                  data-bs-toggle="collapse"
+                  data-bs-target="#navbarNav"
+                >
+                  <span className="navbar-toggler-icon"></span>
+                </button>
+                <div className="collapse navbar-collapse" id="navbarNav">
+                  <ul className="navbar-nav ms-auto">
+                    <li className="nav-item">
+                      <a
+                        href="#"
+                        className={
+                          "nav-link" + (page === "main" ? " active" : "")
+                        }
+                        onClick={(e) => {
+                          e.preventDefault();
+                          setPage("main");
+                        }}
+                      >
+                        Main Page
+                      </a>
+                    </li>
+                    <li className="nav-item">
+                      <a
+                        href="#"
+                        className={
+                          "nav-link" + (page === "lessons" ? " active" : "")
+                        }
+                        onClick={(e) => {
+                          e.preventDefault();
+                          setPage("lessons");
+                        }}
+                      >
+                        Lessons
+                      </a>
+                    </li>
+                    <li className="nav-item">
+                      <a
+                        href="#"
+                        className={
+                          "nav-link" + (page === "examples" ? " active" : "")
+                        }
+                        onClick={(e) => {
+                          e.preventDefault();
+                          setPage("examples");
+                        }}
+                      >
+                        Examples
+                      </a>
+                    </li>
+                    <li className="nav-item">
+                      <a
+                        href="#"
+                        className={
+                          "nav-link" + (page === "quiz" ? " active" : "")
+                        }
+                        onClick={(e) => {
+                          e.preventDefault();
+                          setPage("quiz");
+                        }}
+                      >
+                        Quiz
+                      </a>
+                    </li>
+                  </ul>
+                </div>
+              </div>
+            </nav>
+
+            {content}
+
+            <footer className="bg-light mt-4">
+              <div className="container text-center">
+                <span>
+                  JavaScript Training Website – TT284 TMA – {new Date().getFullYear()}
+                </span>
+              </div>
+            </footer>
+          </>
+        );
+      }
+
+      const root = ReactDOM.createRoot(document.getElementById("root"));
+      root.render(<App />);
+    </script>
+  </body>
+</html>
